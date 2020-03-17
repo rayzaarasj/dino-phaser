@@ -2,10 +2,10 @@ import "phaser";
 import { GameScene } from "./Scenes/GameScene";
 
 const DEFAULT_WIDTH = 1200;
-const DEFAULT_HEIGHT = 300;
+const DEFAULT_HEIGHT = 720;
 
 const config: Phaser.Types.Core.GameConfig = {
-  title: "Tap Rush",
+  title: "Dino",
   scale: {
     parent: "game",
     mode: Phaser.Scale.FIT,
@@ -16,7 +16,7 @@ const config: Phaser.Types.Core.GameConfig = {
   physics: {
       default: "arcade",
       arcade: {
-          debug: false
+          debug: true
       }
   },
   backgroundColor: "#87ceeb",

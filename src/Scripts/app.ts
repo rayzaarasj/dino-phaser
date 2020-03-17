@@ -1,5 +1,6 @@
 import "phaser";
 import { GameScene } from "./Scenes/GameScene";
+import { PreLoadScene } from "./Scenes/PreLoadScene"
 
 const DEFAULT_WIDTH = 1200;
 const DEFAULT_HEIGHT = 720;
@@ -20,7 +21,7 @@ const config: Phaser.Types.Core.GameConfig = {
       }
   },
   backgroundColor: "#87ceeb",
-  scene: [GameScene]
+  scene: [ PreLoadScene, GameScene ]
 };
 export class DinoGame extends Phaser.Game {
   constructor(config: Phaser.Types.Core.GameConfig) {

@@ -6,6 +6,8 @@ export class GameScene extends Phaser.Scene {
     dirtTiles1: Phaser.Physics.Arcade.Group;
     dirtTiles2: Phaser.Physics.Arcade.Group;
     dirtTiles3: Phaser.Physics.Arcade.Group;
+    character: Phaser.Physics.Arcade.Sprite;
+    isWalking: boolean;
     groudSpeed: integer;
     TILE_SIZE: integer;
 
@@ -18,18 +20,51 @@ export class GameScene extends Phaser.Scene {
     init(): void {
         this.groudSpeed = -2;
         this.TILE_SIZE = 64;
+        this.isWalking = false;
     }
 
     create(): void {
-        var character = this.physics.add.image(200, 200, "character");
+        this.anims.create({
+            key:  "walk",
+            frames: this.anims.generateFrameNumbers("characterSheet", { start: 2, end: 3 }),
+            frameRate: 6,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: "jump",
+            frames: this.anims.generateFrameNumbers("characterSheet", { frames: [2,7] }),
+            frameRate: 2,
+            repeat: 0
+        });
+
+        this.character = this.physics.add.sprite(200, 200, "characterSheet");
+        this.character.play("walk");
+        this.character.setSize(64,96);
+
+        this.input.keyboard.on("keydown_UP", function (event: any) {
+            if (this.isWalking) {
+                this.character.setVelocityY(-250);
+                this.character.play("jump");
+                this.isWalking = false;
+            }
+        }, this);
 
         this.grassTiles = this.createTiles(100, 500, "grassTile", 20);
         this.dirtTiles1 = this.createTiles(100, 500+(this.TILE_SIZE), "dirtTile", 20);
         this.dirtTiles2 = this.createTiles(100, 500+(2*this.TILE_SIZE), "dirtTile", 20);
         this.dirtTiles3 = this.createTiles(100, 500+(3*this.TILE_SIZE), "dirtTile", 20);
 
-        character.setGravityY(200);
-        this.physics.add.collider(character, [this.grassTiles]);
+        this.character.setGravityY(200);
+        this.physics.add.collider(
+            this.character, 
+            [this.grassTiles],
+            function (_character: any, _grassTile: any) {
+            if (_character.body.touching.down && _grassTile.body.touching.up && !this.isWalking) {
+                _character.play("walk");
+                this.isWalking = true;
+            }
+        },null, this);
     }
 
     update(time: any): void {

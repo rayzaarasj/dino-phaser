@@ -9,6 +9,7 @@ export class GameScene extends Phaser.Scene {
     obstacles: Phaser.Physics.Arcade.Group;
     backgrounds: Phaser.Physics.Arcade.Group;
     clouds: Phaser.Physics.Arcade.Group;
+    coins: Phaser.Physics.Arcade.Group;
     character: Phaser.Physics.Arcade.Sprite;
     grassCollider: Phaser.Physics.Arcade.Collider;
     obstacleCollider: Phaser.Physics.Arcade.Collider;
@@ -65,18 +66,25 @@ export class GameScene extends Phaser.Scene {
         this.character.setGravityY(200);
 
         this.obstacles = this.physics.add.group({ immovable: true });
+        this.coins = this.physics.add.group({ immovable: true });
         this.time.addEvent({
             delay: 3000,
             callbackScope:this,
             callback: () => {
                 if (this.isPlaying) {
                     var i = Math.random();
-                    var obstacleType = (i > 0.5) ? {name: "gear", y: 350} : {name: "fence", y: 436};
-                    var obstacle = this.obstacles.create(1200, obstacleType.y, obstacleType.name);
-                    this.physics.add.existing(obstacle);
+                    if (i > 0.8) {
+                        var coin = this.coins.create(1300, 300, "coin");
+                        this.physics.add.existing(coin);
+                    } else {
+                        var obstacleType = (i > 0.4) ? {name: "gear", y: 350} : {name: "fence", y: 436};
+                        var obstacle = this.obstacles.create(1300, obstacleType.y, obstacleType.name);
+                        this.physics.add.existing(obstacle);
+                    }
                 }
             },
-            repeat: -1
+            repeat: -1,
+            startAt: 2000
         });
 
         this.clouds = this.physics.add.group({ immovable: true });
@@ -124,6 +132,7 @@ export class GameScene extends Phaser.Scene {
 
         this.grassCollider = this.physics.add.collider(this.character, [this.grassTiles]);
         this.obstacleCollider = this.physics.add.collider(this.character, [this.obstacles], this.gameOver, null, this);
+        this.physics.add.overlap(this.character, [this.coins], this.getCoin, null, this);
     }
 
     update(time: any): void {
@@ -143,6 +152,7 @@ export class GameScene extends Phaser.Scene {
         this.checkInfiniteLoop(this.backgrounds, 1001);
 
         this.obstacles.incX(this.groudSpeed);
+        this.coins.incX(this.groudSpeed);
 
         this.clouds.incX(0.2*this.groudSpeed);
         this.checkInfiniteLoop(this.clouds, 300)
@@ -182,12 +192,17 @@ export class GameScene extends Phaser.Scene {
         this.character.setVelocityY(-250);
     }
 
-    private spawnCloud(x: integer) {
+    private spawnCloud(x: integer): void {
         var i = this.getRandomInt(9) + 1;
         this.clouds.create(x, 100+(this.getRandomInt(4)*20), "cloud"+i);
     }
     
     private getRandomInt(max: integer): integer {
         return Math.floor(Math.random() * Math.floor(max));
+    }
+
+    private getCoin(character: any, coin: any): void {
+        coin.destroy();
+        console.log("coin");
     }
 }

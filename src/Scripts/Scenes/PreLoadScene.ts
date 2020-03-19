@@ -24,6 +24,8 @@ export class PreLoadScene extends Phaser.Scene {
         this.load.image("cloud8", "src/Assets/Background/cloud8.png");
         this.load.image("cloud9", "src/Assets/Background/cloud9.png");
         this.load.image("coin", "src/Assets/Items/platformPack_item008.png");
+        this.load.audio("jump", "src/Assets/Sound/phaserUp5.ogg");
+        this.load.audio("coinSound", "src/Assets/Sound/highUp.ogg");
     }
 
     create(): void {

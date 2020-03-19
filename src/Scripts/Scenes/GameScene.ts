@@ -13,6 +13,8 @@ export class GameScene extends Phaser.Scene {
     character: Phaser.Physics.Arcade.Sprite;
     grassCollider: Phaser.Physics.Arcade.Collider;
     obstacleCollider: Phaser.Physics.Arcade.Collider;
+    jumpSound: Phaser.Sound.BaseSound;
+    coinSound: Phaser.Sound.BaseSound;
     isWalking: boolean;
     groudSpeed: integer;
     TILE_SIZE: integer;
@@ -53,12 +55,20 @@ export class GameScene extends Phaser.Scene {
             repeat: 0
         });
 
+        this.jumpSound = this.sound.add("jump");
+        this.coinSound = this.sound.add("coinSound");
+
         this.grassTiles = this.createTiles(0, 500, "grassTile", 20, this.TILE_SIZE);
         this.dirtTiles1 = this.createTiles(0, 500+(this.TILE_SIZE), "dirtTile", 20, this.TILE_SIZE);
         this.dirtTiles2 = this.createTiles(0, 500+(2*this.TILE_SIZE), "dirtTile", 20, this.TILE_SIZE);
         this.dirtTiles3 = this.createTiles(0, 500+(3*this.TILE_SIZE), "dirtTile", 20, this.TILE_SIZE);
         this.backgrounds = this.createTiles(100, 384, "background", 3, 1001);
         this.backgrounds.setTint(0x2ed1a2);
+
+        this.clouds = this.physics.add.group({ immovable: true });
+        for (var i = 0; i < 5; i++) {
+            this.spawnCloud(100+(i*300));
+        }
 
         this.character = this.physics.add.sprite(200, 300, "characterSheet");
         this.character.play("walk");
@@ -87,15 +97,11 @@ export class GameScene extends Phaser.Scene {
             startAt: 2000
         });
 
-        this.clouds = this.physics.add.group({ immovable: true });
-        for (var i = 0; i < 5; i++) {
-            this.spawnCloud(100+(i*300));
-        }
-
         this.input.keyboard.on("keydown_UP", function (event: any) {
             if (this.isWalking) {
                 this.character.setVelocityY(-250);
                 this.character.play("jump");
+                this.jumpSound.play();
                 this.time.addEvent({
                     delay: 100,
                     callback: () => {
@@ -110,6 +116,7 @@ export class GameScene extends Phaser.Scene {
             if (this.isWalking) {
                 this.character.play("duck");
                 this.character.setSize(64,86);
+                this.character.setY(this.character.y+5);
                 this.time.addEvent({
                     delay: 100,
                     callback: () => {
@@ -153,6 +160,8 @@ export class GameScene extends Phaser.Scene {
 
         this.obstacles.incX(this.groudSpeed);
         this.coins.incX(this.groudSpeed);
+        this.checkForUnusedObject(this.obstacles);
+        this.checkForUnusedObject(this.coins);
 
         this.clouds.incX(0.2*this.groudSpeed);
         this.checkInfiniteLoop(this.clouds, 300)
@@ -204,5 +213,13 @@ export class GameScene extends Phaser.Scene {
     private getCoin(character: any, coin: any): void {
         coin.destroy();
         console.log("coin");
+        this.coinSound.play()
+    }
+
+    private checkForUnusedObject(group: Phaser.Physics.Arcade.Group) {
+        var child = group.getFirst(true);
+        if (child && child.x < -100) {
+            child.destroy();
+        }
     }
 }

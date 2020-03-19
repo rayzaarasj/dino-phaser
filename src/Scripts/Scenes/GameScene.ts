@@ -7,10 +7,11 @@ export class GameScene extends Phaser.Scene {
     dirtTiles2: Phaser.Physics.Arcade.Group;
     dirtTiles3: Phaser.Physics.Arcade.Group;
     obstacles: Phaser.Physics.Arcade.Group;
+    backgrounds: Phaser.Physics.Arcade.Group;
+    clouds: Phaser.Physics.Arcade.Group;
     character: Phaser.Physics.Arcade.Sprite;
     grassCollider: Phaser.Physics.Arcade.Collider;
     obstacleCollider: Phaser.Physics.Arcade.Collider;
-    backgrounds: Phaser.Physics.Arcade.Group;
     isWalking: boolean;
     groudSpeed: integer;
     TILE_SIZE: integer;
@@ -51,14 +52,14 @@ export class GameScene extends Phaser.Scene {
             repeat: 0
         });
 
-        this.grassTiles = this.createTiles(100, 500, "grassTile", 20, this.TILE_SIZE);
-        this.dirtTiles1 = this.createTiles(100, 500+(this.TILE_SIZE), "dirtTile", 20, this.TILE_SIZE);
-        this.dirtTiles2 = this.createTiles(100, 500+(2*this.TILE_SIZE), "dirtTile", 20, this.TILE_SIZE);
-        this.dirtTiles3 = this.createTiles(100, 500+(3*this.TILE_SIZE), "dirtTile", 20, this.TILE_SIZE);
+        this.grassTiles = this.createTiles(0, 500, "grassTile", 20, this.TILE_SIZE);
+        this.dirtTiles1 = this.createTiles(0, 500+(this.TILE_SIZE), "dirtTile", 20, this.TILE_SIZE);
+        this.dirtTiles2 = this.createTiles(0, 500+(2*this.TILE_SIZE), "dirtTile", 20, this.TILE_SIZE);
+        this.dirtTiles3 = this.createTiles(0, 500+(3*this.TILE_SIZE), "dirtTile", 20, this.TILE_SIZE);
         this.backgrounds = this.createTiles(100, 384, "background", 3, 1001);
         this.backgrounds.setTint(0x2ed1a2);
 
-        this.character = this.physics.add.sprite(200, 200, "characterSheet");
+        this.character = this.physics.add.sprite(200, 300, "characterSheet");
         this.character.play("walk");
         this.character.setSize(64,96);
         this.character.setGravityY(200);
@@ -77,6 +78,11 @@ export class GameScene extends Phaser.Scene {
             },
             repeat: -1
         });
+
+        this.clouds = this.physics.add.group({ immovable: true });
+        for (var i = 0; i < 5; i++) {
+            this.spawnCloud(100+(i*300));
+        }
 
         this.input.keyboard.on("keydown_UP", function (event: any) {
             if (this.isWalking) {
@@ -122,21 +128,24 @@ export class GameScene extends Phaser.Scene {
 
     update(time: any): void {
         this.grassTiles.incX(this.groudSpeed);
-        this.checkInfiniteLoop(this.grassTiles, 500, this.TILE_SIZE, "grassTile");
+        this.checkInfiniteLoop(this.grassTiles, this.TILE_SIZE);
 
         this.dirtTiles1.incX(this.groudSpeed);
-        this.checkInfiniteLoop(this.dirtTiles1, 500+(this.TILE_SIZE), this.TILE_SIZE, "dirtTile");
+        this.checkInfiniteLoop(this.dirtTiles1, this.TILE_SIZE);
 
         this.dirtTiles2.incX(this.groudSpeed);
-        this.checkInfiniteLoop(this.dirtTiles2, 500+(2*this.TILE_SIZE), this.TILE_SIZE, "dirtTile");
+        this.checkInfiniteLoop(this.dirtTiles2, this.TILE_SIZE);
 
         this.dirtTiles3.incX(this.groudSpeed);
-        this.checkInfiniteLoop(this.dirtTiles3, 500+(3*this.TILE_SIZE), this.TILE_SIZE, "dirtTile");
+        this.checkInfiniteLoop(this.dirtTiles3, this.TILE_SIZE);
 
         this.backgrounds.incX(0.5*this.groudSpeed);
-        this.checkInfiniteLoop(this.backgrounds, 384, 1001, "background");
+        this.checkInfiniteLoop(this.backgrounds, 1001);
 
         this.obstacles.incX(this.groudSpeed);
+
+        this.clouds.incX(0.2*this.groudSpeed);
+        this.checkInfiniteLoop(this.clouds, 300)
         
         if (this.character.y == 420 && !this.isWalking) {
             this.isWalking = true;
@@ -154,12 +163,12 @@ export class GameScene extends Phaser.Scene {
         return tiles;
     }
 
-    private checkInfiniteLoop(tiles: Phaser.Physics.Arcade.Group, y: integer, imageWidth: integer, image: string): void {
+    private checkInfiniteLoop(tiles: Phaser.Physics.Arcade.Group, imageWidth: integer): void {
         var firstTile = tiles.getFirst(true);
         if (firstTile.x <= -(imageWidth/2)) { 
             var lastTile = tiles.getLast(true);
             tiles.remove(firstTile);
-            firstTile.setPosition(lastTile.x+imageWidth, y);
+            firstTile.setPosition(lastTile.x+imageWidth, firstTile.y);
             tiles.add(firstTile);
         }
     }
@@ -171,5 +180,14 @@ export class GameScene extends Phaser.Scene {
         this.physics.world.removeCollider(this.obstacleCollider);
         this.character.play("jump");
         this.character.setVelocityY(-250);
+    }
+
+    private spawnCloud(x: integer) {
+        var i = this.getRandomInt(9) + 1;
+        this.clouds.create(x, 100+(this.getRandomInt(4)*20), "cloud"+i);
+    }
+    
+    private getRandomInt(max: integer): integer {
+        return Math.floor(Math.random() * Math.floor(max));
     }
 }

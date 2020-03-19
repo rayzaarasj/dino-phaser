@@ -8,13 +8,21 @@ export class PreLoadScene extends Phaser.Scene {
     }
 
     preload(): void {
-        this.load.image("character", "src/Assets/Characters/platformChar_walk1.png");
         this.load.image("grassTile", "src/Assets/Tiles/platformPack_tile001.png");
         this.load.image("dirtTile", "src/Assets/Tiles/platformPack_tile004.png");
         this.load.spritesheet("characterSheet", "src/Assets/Spritesheet/platformerPack_character.png", { frameWidth: 96, frameHeight: 96 });
         this.load.image("fence", "src/Assets/Tiles/platformPack_tile038.png");
         this.load.image("gear", "src/Assets/Tiles/platformPack_tile024.png");
         this.load.image("background", "src/Assets/Background/pointy_mountains.png");
+        this.load.image("cloud1", "src/Assets/Background/cloud1.png");
+        this.load.image("cloud2", "src/Assets/Background/cloud2.png");
+        this.load.image("cloud3", "src/Assets/Background/cloud3.png");
+        this.load.image("cloud4", "src/Assets/Background/cloud4.png");
+        this.load.image("cloud5", "src/Assets/Background/cloud5.png");
+        this.load.image("cloud6", "src/Assets/Background/cloud6.png");
+        this.load.image("cloud7", "src/Assets/Background/cloud7.png");
+        this.load.image("cloud8", "src/Assets/Background/cloud8.png");
+        this.load.image("cloud9", "src/Assets/Background/cloud9.png");
     }
 
     create(): void {

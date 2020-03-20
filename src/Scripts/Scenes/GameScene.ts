@@ -15,10 +15,13 @@ export class GameScene extends Phaser.Scene {
     obstacleCollider: Phaser.Physics.Arcade.Collider;
     jumpSound: Phaser.Sound.BaseSound;
     coinSound: Phaser.Sound.BaseSound;
+    scoreText: Phaser.GameObjects.Text;
+    fpsText: Phaser.GameObjects.Text;
     isWalking: boolean;
     groudSpeed: integer;
     TILE_SIZE: integer;
     isPlaying: boolean;
+    score: integer;
 
     constructor() {
         super({
@@ -31,6 +34,7 @@ export class GameScene extends Phaser.Scene {
         this.TILE_SIZE = 64;
         this.isWalking = false;
         this.isPlaying = true;
+        this.score = 0;
     }
 
     create(): void {
@@ -97,6 +101,21 @@ export class GameScene extends Phaser.Scene {
             startAt: 2000
         });
 
+        this.scoreText = this.add.text(600, 50, "" + this.score, { 
+            fontFamily: "Roboto Condensed", 
+            color: "#000",
+            fontSize: "64px" 
+        });
+        this.scoreText.setOrigin(0.5);
+        
+        this.fpsText = this.add.text(0, 0, "fps: " + this.game.loop.actualFps, {
+            fontFamily: "Roboto Condensed",
+            color: "#000",
+        });
+
+        this.add.text(10,25,"Up Arrow - Jump", { fontFamily: "Roboto Condensed", color: "#000", fontSize: "32px"});
+        this.add.text(10,60,"Down Arrow - Duck", { fontFamily: "Roboto Condensed", color: "#000", fontSize: "32px"});
+
         this.input.keyboard.on("keydown_UP", function (event: any) {
             if (this.isWalking) {
                 this.character.setVelocityY(-250);
@@ -136,6 +155,23 @@ export class GameScene extends Phaser.Scene {
                 });
             }
         }, this);
+        
+        this.input.keyboard.on("keydown_R", function (event: any) {
+            if (!this.isPlaying) {
+                this.scene.start("GameScene");
+            }
+        }, this);
+
+        this.time.addEvent({
+            delay: 1000,
+            callbackScope: this,
+            repeat: -1,
+            callback: () => {
+                if (this.isPlaying) {
+                    this.score += 100;
+                }
+            }
+        });
 
         this.grassCollider = this.physics.add.collider(this.character, [this.grassTiles]);
         this.obstacleCollider = this.physics.add.collider(this.character, [this.obstacles], this.gameOver, null, this);
@@ -143,6 +179,9 @@ export class GameScene extends Phaser.Scene {
     }
 
     update(time: any): void {
+        this.scoreText.setText("" + this.score).setX(600);
+        this.fpsText.setText("fps: " + Math.floor(this.game.loop.actualFps));
+
         this.grassTiles.incX(this.groudSpeed);
         this.checkInfiniteLoop(this.grassTiles, this.TILE_SIZE);
 
@@ -199,6 +238,12 @@ export class GameScene extends Phaser.Scene {
         this.physics.world.removeCollider(this.obstacleCollider);
         this.character.play("jump");
         this.character.setVelocityY(-250);
+        this.add.text(0, 0, "Game Over\n\nPress R to Restart", {
+            fontFamily: "Roboto Condensed",
+            fontSize: "64px",
+            color: "#000",
+            align: "center"
+        }).setOrigin(0.5).setPosition(600, 250);
     }
 
     private spawnCloud(x: integer): void {
@@ -212,8 +257,8 @@ export class GameScene extends Phaser.Scene {
 
     private getCoin(character: any, coin: any): void {
         coin.destroy();
-        console.log("coin");
         this.coinSound.play()
+        this.score += 150;
     }
 
     private checkForUnusedObject(group: Phaser.Physics.Arcade.Group) {

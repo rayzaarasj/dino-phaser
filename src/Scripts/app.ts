@@ -1,6 +1,6 @@
 import "phaser";
 import { GameScene } from "./Scenes/GameScene";
-import { PreLoadScene } from "./Scenes/PreLoadScene"
+import { PreLoadScene } from "./Scenes/PreLoadScene";
 
 const DEFAULT_WIDTH = 1200;
 const DEFAULT_HEIGHT = 720;
@@ -15,13 +15,13 @@ const config: Phaser.Types.Core.GameConfig = {
     height: DEFAULT_HEIGHT
   },
   physics: {
-      default: "arcade",
-      arcade: {
-          debug: false
-      }
+    default: "arcade",
+    arcade: {
+      debug: false
+    }
   },
   backgroundColor: "#87ceeb",
-  scene: [ PreLoadScene, GameScene ]
+  scene: [PreLoadScene, GameScene]
 };
 export class DinoGame extends Phaser.Game {
   constructor(config: Phaser.Types.Core.GameConfig) {

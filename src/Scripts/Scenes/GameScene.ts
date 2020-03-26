@@ -1,15 +1,17 @@
 import "phaser";
 import { Character } from "../GameObjects/Character";
+import { Fence } from "../GameObjects/Fence";
+import { Gear } from "../GameObjects/Gear";
+import { Coin } from "../GameObjects/Coin";
 
 export class GameScene extends Phaser.Scene {
   grassTiles: Phaser.Physics.Arcade.Group;
   dirtTiles1: Phaser.Physics.Arcade.Group;
   dirtTiles2: Phaser.Physics.Arcade.Group;
   dirtTiles3: Phaser.Physics.Arcade.Group;
-  obstacles: Phaser.Physics.Arcade.Group;
+  interactables: Phaser.Physics.Arcade.Group;
   backgrounds: Phaser.Physics.Arcade.Group;
   clouds: Phaser.Physics.Arcade.Group;
-  coins: Phaser.Physics.Arcade.Group;
   character: Phaser.Physics.Arcade.Sprite;
   grassCollider: Phaser.Physics.Arcade.Collider;
   obstacleCollider: Phaser.Physics.Arcade.Collider;
@@ -71,31 +73,26 @@ export class GameScene extends Phaser.Scene {
 
     this.character = new Character({ scene: this, x: 200, y: 300 });
 
-    this.obstacles = this.physics.add.group({ immovable: true });
-    this.coins = this.physics.add.group({ immovable: true });
+    this.interactables = this.physics.add.group({ immovable: true });
     this.time.addEvent({
       delay: 3000,
       callbackScope: this,
       callback: () => {
         if (this.isPlaying) {
           var i = Math.random();
+          var interactable: Phaser.GameObjects.GameObject;
           if (i > 0.8) {
-            var coin = this.coins.create(1300, 300, "coin");
-            this.physics.add.existing(coin);
+            interactable = new Coin({ scene: this });
+          } else if (i > 0.4) {
+            interactable = new Gear({ scene: this });
           } else {
-            var obstacleType =
-              i > 0.4 ? { name: "gear", y: 350 } : { name: "fence", y: 436 };
-            var obstacle = this.obstacles.create(
-              1300,
-              obstacleType.y,
-              obstacleType.name
-            );
-            this.physics.add.existing(obstacle);
+            interactable = new Fence({ scene: this });
           }
+          this.interactables.add(interactable);
         }
       },
       repeat: -1,
-      startAt: 2000
+      startAt: 2999
     });
 
     this.scoreText = this.add
@@ -148,15 +145,10 @@ export class GameScene extends Phaser.Scene {
     ]);
     this.obstacleCollider = this.physics.add.collider(
       this.character,
-      [this.obstacles],
-      this.gameOver,
-      null,
-      this
-    );
-    this.physics.add.overlap(
-      this.character,
-      [this.coins],
-      this.getCoin,
+      [this.interactables],
+      function(character: any, obstacle: any) {
+        obstacle.onCollide();
+      },
       null,
       this
     );
@@ -181,10 +173,7 @@ export class GameScene extends Phaser.Scene {
     this.backgrounds.incX(0.5 * this.groudSpeed);
     this.checkInfiniteLoop(this.backgrounds, 1001);
 
-    this.obstacles.incX(this.groudSpeed);
-    this.coins.incX(this.groudSpeed);
-    this.checkForUnusedObject(this.obstacles);
-    this.checkForUnusedObject(this.coins);
+    this.interactables.incX(this.groudSpeed);
 
     this.clouds.incX(0.2 * this.groudSpeed);
     this.checkInfiniteLoop(this.clouds, 300);
@@ -219,7 +208,7 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
-  private gameOver(): void {
+  gameOver(): void {
     this.groudSpeed = 0;
     this.isPlaying = false;
     this.physics.world.removeCollider(this.grassCollider);
@@ -246,8 +235,7 @@ export class GameScene extends Phaser.Scene {
     return Math.floor(Math.random() * Math.floor(max));
   }
 
-  private getCoin(character: any, coin: any): void {
-    coin.destroy();
+  getCoin(): void {
     this.coinSound.play();
     this.score += 150;
   }

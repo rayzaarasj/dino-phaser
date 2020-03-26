@@ -239,11 +239,4 @@ export class GameScene extends Phaser.Scene {
     this.coinSound.play();
     this.score += 150;
   }
-
-  private checkForUnusedObject(group: Phaser.Physics.Arcade.Group) {
-    var child = group.getFirst(true);
-    if (child && child.x < -100) {
-      child.destroy();
-    }
-  }
 }

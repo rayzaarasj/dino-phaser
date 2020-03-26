@@ -10,7 +10,7 @@ export class PreLoadScene extends Phaser.Scene {
     preload(): void {
         this.load.image("grassTile", "src/Assets/Tiles/platformPack_tile001.png");
         this.load.image("dirtTile", "src/Assets/Tiles/platformPack_tile004.png");
-        this.load.spritesheet("characterSheet", "src/Assets/Spritesheet/platformerPack_character.png", { frameWidth: 96, frameHeight: 96 });
+        this.load.spritesheet("character", "src/Assets/Spritesheet/platformerPack_character.png", { frameWidth: 96, frameHeight: 96 });
         this.load.image("fence", "src/Assets/Tiles/platformPack_tile038.png");
         this.load.image("gear", "src/Assets/Tiles/platformPack_tile024.png");
         this.load.image("background", "src/Assets/Background/pointy_mountains.png");

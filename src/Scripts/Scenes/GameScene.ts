@@ -1,5 +1,5 @@
 import "phaser";
-import { Physics } from "phaser";
+import { Character } from "../GameObjects/Character";
 
 export class GameScene extends Phaser.Scene {
     grassTiles: Phaser.Physics.Arcade.Group;
@@ -17,7 +17,6 @@ export class GameScene extends Phaser.Scene {
     coinSound: Phaser.Sound.BaseSound;
     scoreText: Phaser.GameObjects.Text;
     fpsText: Phaser.GameObjects.Text;
-    isWalking: boolean;
     groudSpeed: integer;
     TILE_SIZE: integer;
     isPlaying: boolean;
@@ -32,33 +31,11 @@ export class GameScene extends Phaser.Scene {
     init(): void {
         this.groudSpeed = -3;
         this.TILE_SIZE = 64;
-        this.isWalking = false;
         this.isPlaying = true;
         this.score = 0;
     }
 
     create(): void {
-        this.anims.create({
-            key:  "walk",
-            frames: this.anims.generateFrameNumbers("characterSheet", { start: 2, end: 3 }),
-            frameRate: 6,
-            repeat: -1
-        });
-
-        this.anims.create({
-            key: "jump",
-            frames: this.anims.generateFrameNumbers("characterSheet", { frames: [2,7] }),
-            frameRate: 2,
-            repeat: 0
-        });
-
-        this.anims.create({
-            key: "duck",
-            frames: this.anims.generateFrameNumbers("characterSheet", { frames: [6] }),
-            frameRate: 1,
-            repeat: 0
-        });
-
         this.jumpSound = this.sound.add("jump");
         this.coinSound = this.sound.add("coinSound");
 
@@ -74,10 +51,7 @@ export class GameScene extends Phaser.Scene {
             this.spawnCloud(100+(i*300));
         }
 
-        this.character = this.physics.add.sprite(200, 300, "characterSheet");
-        this.character.play("walk");
-        this.character.setSize(64,96);
-        this.character.setGravityY(200);
+        this.character = new Character({scene: this, x: 200, y: 300});
 
         this.obstacles = this.physics.add.group({ immovable: true });
         this.coins = this.physics.add.group({ immovable: true });
@@ -116,46 +90,6 @@ export class GameScene extends Phaser.Scene {
         this.add.text(10,25,"Up Arrow - Jump", { fontFamily: "Roboto Condensed", color: "#000", fontSize: "32px"});
         this.add.text(10,60,"Down Arrow - Duck", { fontFamily: "Roboto Condensed", color: "#000", fontSize: "32px"});
 
-        this.input.keyboard.on("keydown_UP", function (event: any) {
-            if (this.isWalking) {
-                this.character.setVelocityY(-250);
-                this.character.play("jump");
-                this.jumpSound.play();
-                this.time.addEvent({
-                    delay: 100,
-                    callback: () => {
-                        this.isWalking = false;
-                    },
-                    callbackScope: this
-                })
-            }
-        }, this);
-
-        this.input.keyboard.on("keydown_DOWN", function (event: any) {
-            if (this.isWalking) {
-                this.character.play("duck");
-                this.character.setSize(64,86);
-                this.character.setY(this.character.y+5);
-                this.time.addEvent({
-                    delay: 100,
-                    callback: () => {
-                        this.isWalking = false;
-                    },
-                    callbackScope: this
-                });
-                this.time.addEvent({
-                    delay: 2500,
-                    callback: () => {
-                        this.character.play("walk");
-                        this.character.setY(this.character.y-5);
-                        this.character.setSize(64,96);
-                        this.isWalking = true;
-                    },
-                    callbackScope: this
-                });
-            }
-        }, this);
-        
         this.input.keyboard.on("keydown_R", function (event: any) {
             if (!this.isPlaying) {
                 this.scene.start("GameScene");
@@ -204,14 +138,9 @@ export class GameScene extends Phaser.Scene {
 
         this.clouds.incX(0.2*this.groudSpeed);
         this.checkInfiniteLoop(this.clouds, 300)
-        
-        if (this.character.y == 420 && !this.isWalking) {
-            this.isWalking = true;
-            this.character.play("walk");
-        }
     }
 
-    private createTiles(x: integer, y: integer, image: string, amount: integer, imageWidth: integer): Physics.Arcade.Group {
+    private createTiles(x: integer, y: integer, image: string, amount: integer, imageWidth: integer): Phaser.Physics.Arcade.Group {
         var tiles = this.physics.add.group({ immovable : true });
         for (var i = 0; i < amount; i++) {
             var tile = tiles.create(x+(i*imageWidth), y, image);

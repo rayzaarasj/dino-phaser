@@ -12,28 +12,28 @@ export class Character extends Phaser.Physics.Arcade.Sprite {
       key: "walk",
       frames: this.scene.anims.generateFrameNumbers("character", {
         start: 2,
-        end: 3
+        end: 3,
       }),
       frameRate: 6,
-      repeat: -1
+      repeat: -1,
     });
 
     this.scene.anims.create({
       key: "jump",
       frames: this.scene.anims.generateFrameNumbers("character", {
-        frames: [2, 7]
+        frames: [2, 7],
       }),
       frameRate: 2,
-      repeat: 0
+      repeat: 0,
     });
 
     this.scene.anims.create({
       key: "duck",
       frames: this.scene.anims.generateFrameNumbers("character", {
-        frames: [6]
+        frames: [6],
       }),
       frameRate: 1,
-      repeat: 0
+      repeat: 0,
     });
 
     this.play("walk");
@@ -42,18 +42,13 @@ export class Character extends Phaser.Physics.Arcade.Sprite {
 
     this.scene.input.keyboard.on(
       "keydown_UP",
-      function(event: any) {
+      function (event: any) {
         if (this.isWalking) {
+          this.setY(this.y - 1);
           this.setVelocityY(-250);
           this.play("jump");
           this.scene.jumpSound.play();
-          this.scene.time.addEvent({
-            delay: 100,
-            callback: () => {
-              this.isWalking = false;
-            },
-            callbackScope: this
-          });
+          this.isWalking = false;
         }
       },
       this
@@ -61,18 +56,12 @@ export class Character extends Phaser.Physics.Arcade.Sprite {
 
     this.scene.input.keyboard.on(
       "keydown_DOWN",
-      function(event: any) {
+      function (event: any) {
         if (this.isWalking) {
           this.play("duck");
           this.setSize(64, 86);
           this.setY(this.y + 5);
-          this.scene.time.addEvent({
-            delay: 100,
-            callback: () => {
-              this.isWalking = false;
-            },
-            callbackScope: this
-          });
+          this.isWalking = false;
           this.scene.time.addEvent({
             delay: 2500,
             callback: () => {
@@ -81,7 +70,7 @@ export class Character extends Phaser.Physics.Arcade.Sprite {
               this.setSize(64, 96);
               this.isWalking = true;
             },
-            callbackScope: this
+            callbackScope: this,
           });
         }
       },

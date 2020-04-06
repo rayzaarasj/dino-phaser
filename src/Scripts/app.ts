@@ -12,16 +12,16 @@ const config: Phaser.Types.Core.GameConfig = {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
     width: DEFAULT_WIDTH,
-    height: DEFAULT_HEIGHT
+    height: DEFAULT_HEIGHT,
   },
   physics: {
     default: "arcade",
     arcade: {
-      debug: false
-    }
+      debug: false,
+    },
   },
   backgroundColor: "#87ceeb",
-  scene: [PreLoadScene, GameScene]
+  scene: [PreLoadScene, GameScene],
 };
 export class DinoGame extends Phaser.Game {
   constructor(config: Phaser.Types.Core.GameConfig) {

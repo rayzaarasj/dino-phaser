@@ -3,7 +3,7 @@ import "phaser";
 export class PreLoadScene extends Phaser.Scene {
   constructor() {
     super({
-      key: "PreLoadScene"
+      key: "PreLoadScene",
     });
   }
 

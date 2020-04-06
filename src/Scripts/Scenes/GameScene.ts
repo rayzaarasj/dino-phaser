@@ -26,7 +26,7 @@ export class GameScene extends Phaser.Scene {
 
   constructor() {
     super({
-      key: "GameScene"
+      key: "GameScene",
     });
   }
 
@@ -92,36 +92,36 @@ export class GameScene extends Phaser.Scene {
         }
       },
       repeat: -1,
-      startAt: 2999
+      startAt: 2999,
     });
 
     this.scoreText = this.add
       .text(600, 50, "" + this.score, {
         fontFamily: "Roboto Condensed",
         color: "#000",
-        fontSize: "64px"
+        fontSize: "64px",
       })
       .setOrigin(0.5);
 
     this.fpsText = this.add.text(0, 0, "fps: " + this.game.loop.actualFps, {
       fontFamily: "Roboto Condensed",
-      color: "#000"
+      color: "#000",
     });
 
     this.add.text(10, 25, "Up Arrow - Jump", {
       fontFamily: "Roboto Condensed",
       color: "#000",
-      fontSize: "32px"
+      fontSize: "32px",
     });
     this.add.text(10, 60, "Down Arrow - Duck", {
       fontFamily: "Roboto Condensed",
       color: "#000",
-      fontSize: "32px"
+      fontSize: "32px",
     });
 
     this.input.keyboard.on(
       "keydown_R",
-      function(event: any) {
+      function (event: any) {
         if (!this.isPlaying) {
           this.scene.start("GameScene");
         }
@@ -137,16 +137,16 @@ export class GameScene extends Phaser.Scene {
         if (this.isPlaying) {
           this.score += 100;
         }
-      }
+      },
     });
 
     this.grassCollider = this.physics.add.collider(this.character, [
-      this.grassTiles
+      this.grassTiles,
     ]);
     this.obstacleCollider = this.physics.add.collider(
       this.character,
       [this.interactables],
-      function(character: any, obstacle: any) {
+      function (character: any, obstacle: any) {
         obstacle.onCollide();
       },
       null,
@@ -220,7 +220,7 @@ export class GameScene extends Phaser.Scene {
         fontFamily: "Roboto Condensed",
         fontSize: "64px",
         color: "#000",
-        align: "center"
+        align: "center",
       })
       .setOrigin(0.5)
       .setPosition(600, 250);

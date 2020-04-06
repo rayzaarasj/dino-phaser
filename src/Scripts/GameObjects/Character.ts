@@ -8,6 +8,8 @@ export class Character extends Phaser.Physics.Arcade.Sprite {
     this.scene.add.existing(this);
     this.scene.physics.add.existing(this);
 
+    this.setDepth(1);
+
     this.scene.anims.create({
       key: "walk",
       frames: this.scene.anims.generateFrameNumbers("character", {
